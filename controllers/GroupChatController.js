@@ -55,7 +55,6 @@ const getGroupChatByGroupChatId = async (req, res) => {
     }
 }
 
-
 const getGroupChatsByUserId = async (req, res) => {
     const {user_id} = req.user;
 
@@ -89,7 +88,10 @@ const createChatLog = async (req, res) => {
 
         // Get that newly created chat log
         const [chatLogs] = await db.query(`
-            SELECT * FROM GroupChatLogs WHERE group_chat_log_id = ?
+            SELECT *, u.username 
+            FROM GroupChatLogs
+            JOIN Users u ON GroupChatLogs.sender_id = u.user_id
+            WHERE group_chat_log_id = ?
         `, [result[0].insertId]);
 
         // Return new chatlog
