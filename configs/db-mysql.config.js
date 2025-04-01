@@ -48,7 +48,7 @@ const createDatabase = () => {
                     sender_id varchar(50) NOT NULL,
                     message TEXT NOT NULL,
                     created_at TIMESTAMP,
-                    updated_at TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                     FOREIGN KEY (private_chat_id) REFERENCES PrivateChats(private_chat_id),
                     FOREIGN KEY (sender_id) REFERENCES Users(user_id)
                 )
@@ -90,7 +90,7 @@ const createDatabase = () => {
                     sender_id varchar(50) NOT NULL,
                     message TEXT NOT NULL,
                     created_at TIMESTAMP,
-                    updated_at TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                     FOREIGN KEY (group_chat_id) REFERENCES GroupChats(group_chat_id),
                     FOREIGN KEY (sender_id) REFERENCES Users(user_id)
                 )
