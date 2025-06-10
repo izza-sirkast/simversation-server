@@ -14,9 +14,9 @@ const db = mysql.createPool({
 const createDatabase = () => {
     const createDatabasesQuery = [
         {
-            name: 'Users',
+            name: 'users',
             query: `
-                CREATE TABLE IF NOT EXISTS Users (
+                CREATE TABLE IF NOT EXISTS users (
                     user_id varchar(50) PRIMARY KEY,
                     username VARCHAR(50) NOT NULL UNIQUE,
                     password VARCHAR(255) NOT NULL,
@@ -26,38 +26,38 @@ const createDatabase = () => {
             `
         },
         {
-            name: 'PrivateChats',
+            name: 'private_chats',
             query: `
-                CREATE TABLE IF NOT EXISTS PrivateChats (
+                CREATE TABLE IF NOT EXISTS private_chats (
                     private_chat_id varchar(50) PRIMARY KEY,
                     user_1_id varchar(50) NOT NULL,
                     user_2_id varchar(50) NOT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    FOREIGN KEY (user_1_id) REFERENCES Users(user_id),
-                    FOREIGN KEY (user_2_id) REFERENCES Users(user_id)                  
+                    FOREIGN KEY (user_1_id) REFERENCES users(user_id),
+                    FOREIGN KEY (user_2_id) REFERENCES users(user_id)                  
                 )
             `
         },
         {
-            name: 'PrivateChatLogs',
+            name: 'private_chat_logs',
             query: `
-                CREATE TABLE IF NOT EXISTS PrivateChatLogs (
+                CREATE TABLE IF NOT EXISTS private_chat_logs (
                     private_chat_log_id INT PRIMARY KEY AUTO_INCREMENT,
                     private_chat_id varchar(50) NOT NULL,
                     sender_id varchar(50) NOT NULL,
                     message TEXT NOT NULL,
                     created_at TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    FOREIGN KEY (private_chat_id) REFERENCES PrivateChats(private_chat_id),
-                    FOREIGN KEY (sender_id) REFERENCES Users(user_id)
+                    FOREIGN KEY (private_chat_id) REFERENCES private_chats(private_chat_id),
+                    FOREIGN KEY (sender_id) REFERENCES users(user_id)
                 )
             `
         },
         {
-            name: 'GroupChats',
+            name: 'group_chats',
             query: `
-                CREATE TABLE IF NOT EXISTS GroupChats (
+                CREATE TABLE IF NOT EXISTS group_chats (
                     group_chat_id varchar(50) PRIMARY KEY,
                     group_chat_name VARCHAR(50) NOT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -66,9 +66,9 @@ const createDatabase = () => {
             `
         },
         {
-            name: 'UserGroups',
+            name: 'user_group_chats',
             query: `
-                CREATE TABLE IF NOT EXISTS UserGroupchats (
+                CREATE TABLE IF NOT EXISTS user_group_chats (
                     user_id varchar(50) NOT NULL,
                     group_chat_id varchar(50) NOT NULL,
                     primary key (user_id, group_chat_id),
@@ -76,23 +76,23 @@ const createDatabase = () => {
                     verified BOOLEAN NOT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    FOREIGN KEY (user_id) REFERENCES Users(user_id),
-                    FOREIGN KEY (group_chat_id) REFERENCES GroupChats(group_chat_id)
+                    FOREIGN KEY (user_id) REFERENCES users(user_id),
+                    FOREIGN KEY (group_chat_id) REFERENCES group_chats(group_chat_id)
                 )
             `
         },
         {
-            name: 'GroupChatLogs',
+            name: 'group_chat_logs',
             query: `
-                CREATE TABLE IF NOT EXISTS GroupChatLogs (
+                CREATE TABLE IF NOT EXISTS group_chat_logs (
                     group_chat_log_id INT PRIMARY KEY AUTO_INCREMENT,
                     group_chat_id varchar(50) NOT NULL,
                     sender_id varchar(50) NOT NULL,
                     message TEXT NOT NULL,
                     created_at TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    FOREIGN KEY (group_chat_id) REFERENCES GroupChats(group_chat_id),
-                    FOREIGN KEY (sender_id) REFERENCES Users(user_id)
+                    FOREIGN KEY (group_chat_id) REFERENCES group_chats(group_chat_id),
+                    FOREIGN KEY (sender_id) REFERENCES users(user_id)
                 )
             `
         }

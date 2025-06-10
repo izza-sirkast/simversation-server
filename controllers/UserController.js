@@ -48,6 +48,7 @@ const register = async (req, res) => {
         await db.query('INSERT INTO users (user_id, username, password) VALUES (?, ?, ?)', [user_id, username, hashedPassword]);
         return res.status(201).json({message: 'User created successfully'});
     } catch (error) {
+        console.log(error, 'Error creating user');
         return res.status(500).json({message: 'Internal Server Error'})
     }
 }
@@ -62,9 +63,10 @@ const login = async (req, res) => {
         if(users.length == 0 || !bcrypt.compareSync(password, user.password)){
             return res.status(400).json({message : 'Username or password is incorrect'});
         }
+
         
         const token = generateToken(user);
-
+        
         res.cookie('jwt', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production', // Only send over https
@@ -74,6 +76,7 @@ const login = async (req, res) => {
 
         return res.status(200).json({message: 'Login Successful'})
     } catch (error) {
+        console.log(error, 'Error logging in user');
         return res.status(500).json({message: 'Internal Server Error'})
     }
 }

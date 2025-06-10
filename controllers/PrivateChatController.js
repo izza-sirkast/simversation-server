@@ -10,7 +10,7 @@ const getByUserId = async (req, res) => {
     try {
         // Check if room already exist
         const [privateChats] = await db.query(`
-                SELECT * FROM PrivateChats
+                SELECT * FROM private_chats
                 WHERE (user_1_id = ? AND user_2_id = ?) OR (user_1_id = ? AND user_2_id = ?)
             `, [user_1_id, user_2_id, user_2_id, user_1_id]);
         
@@ -21,7 +21,7 @@ const getByUserId = async (req, res) => {
         // Else create new room
         const private_chat_id = Date.now().toString()+'-'+randomUUID();
         await db.query(`
-            INSERT INTO PrivateChats (private_chat_id, user_1_id, user_2_id) VALUES (?, ?, ?)
+            INSERT INTO private_chats (private_chat_id, user_1_id, user_2_id) VALUES (?, ?, ?)
         `, [private_chat_id, user_1_id, user_2_id]);
         return res.status(201).json({message: 'Room created', private_chat_id});
     } catch (error) {
@@ -35,8 +35,8 @@ const getFriends = async (req, res) => {
     try {
         const [friends] = await db.query(`
             SELECT pc.*
-            FROM privatechats pc
-            JOIN privatechatlogs pcl USING(private_chat_id)
+            FROM private_chats pc
+            JOIN private_chat_logs pcl USING(private_chat_id)
             WHERE (user_1_id = ?) OR (user_2_id = ?)
             GROUP BY pc.private_chat_id;
         `, [userId, userId]);
@@ -45,7 +45,7 @@ const getFriends = async (req, res) => {
         for(let i = 0; i < friends.length; i++){
             const friendId = friends[i].user_1_id == userId ? friends[i].user_2_id : friends[i].user_1_id;
             const [users] = await db.query(`
-                SELECT u.user_id, u.username FROM Users u WHERE user_id = ?
+                SELECT u.user_id, u.username FROM users u WHERE user_id = ?
             `, [friendId]);
             friends[i].friend = users[0];
         }
@@ -67,12 +67,12 @@ const createChatLog = async (req, res) => {
 
     try {
         const result = await db.query(`
-            INSERT INTO PrivateChatLogs (private_chat_id, sender_id, message, created_at, updated_at) VALUES (?, ?, ?, ?, ?)
+            INSERT INTO private_chat_logs (private_chat_id, sender_id, message, created_at, updated_at) VALUES (?, ?, ?, ?, ?)
         `, [private_chat_id, sender_id, message, created_at, updated_at]);
 
         // Get that newly created chat log
         const [chatLogs] = await db.query(`
-            SELECT * FROM PrivateChatLogs WHERE private_chat_log_id = ?
+            SELECT * FROM private_chat_logs WHERE private_chat_log_id = ?
         `, [result[0].insertId]);
 
         // Return new chatlog
@@ -89,7 +89,7 @@ const getChatLogsByPrivateChatId = async (req, res) => {
 
     try {
         const [chatLogs] = await db.query(`
-            SELECT * FROM PrivateChatLogs 
+            SELECT * FROM private_chat_logs 
             WHERE private_chat_id = ?
             ORDER BY created_at ASC
         `, [privateChatId]);
