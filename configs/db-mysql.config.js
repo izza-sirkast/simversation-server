@@ -34,8 +34,8 @@ const createDatabase = () => {
                     user_2_id varchar(50) NOT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    FOREIGN KEY (user_1_id) REFERENCES users(user_id),
-                    FOREIGN KEY (user_2_id) REFERENCES users(user_id)                  
+                    FOREIGN KEY (user_1_id) REFERENCES users(user_id) ON DELETE CASCADE,
+                    FOREIGN KEY (user_2_id) REFERENCES users(user_id) ON DELETE CASCADE                  
                 )
             `
         },
@@ -49,8 +49,8 @@ const createDatabase = () => {
                     message TEXT NOT NULL,
                     created_at TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    FOREIGN KEY (private_chat_id) REFERENCES private_chats(private_chat_id),
-                    FOREIGN KEY (sender_id) REFERENCES users(user_id)
+                    FOREIGN KEY (private_chat_id) REFERENCES private_chats(private_chat_id) ON DELETE CASCADE,
+                    FOREIGN KEY (sender_id) REFERENCES users(user_id) ON DELETE CASCADE
                 )
             `
         },
@@ -76,8 +76,8 @@ const createDatabase = () => {
                     verified BOOLEAN NOT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    FOREIGN KEY (user_id) REFERENCES users(user_id),
-                    FOREIGN KEY (group_chat_id) REFERENCES group_chats(group_chat_id)
+                    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+                    FOREIGN KEY (group_chat_id) REFERENCES group_chats(group_chat_id) ON DELETE CASCADE
                 )
             `
         },
@@ -91,8 +91,8 @@ const createDatabase = () => {
                     message TEXT NOT NULL,
                     created_at TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    FOREIGN KEY (group_chat_id) REFERENCES group_chats(group_chat_id),
-                    FOREIGN KEY (sender_id) REFERENCES users(user_id)
+                    FOREIGN KEY (group_chat_id) REFERENCES group_chats(group_chat_id) ON DELETE CASCADE,
+                    FOREIGN KEY (sender_id) REFERENCES users(user_id) ON DELETE CASCADE
                 )
             `
         }

@@ -35,7 +35,7 @@ const generateToken = (user) => {
 
 const register = async (req, res) => {
     const {username, password} = req.body;
-    const hashedPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(15));
+    const hashedPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
     const user_id = Date.now().toString()+'-'+randomUUID();
 
     try {
@@ -59,12 +59,16 @@ const login = async (req, res) => {
     try {
         const [users] = await db.query('SELECT * FROM users WHERE username = ?', [username]);
         const user = users[0];
-        
-        if(users.length == 0 || !bcrypt.compareSync(password, user.password)){
+
+        if(!user){
             return res.status(400).json({message : 'Username or password is incorrect'});
         }
 
-        
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if(!isPasswordValid){
+            return res.status(400).json({message : 'Username or password is incorrect'});
+        }
+
         const token = generateToken(user);
         
         res.cookie('jwt', token, {
