@@ -26,6 +26,38 @@ const getByUsername = async (req, res) => {
     }
 }
 
+const getProfileByUserId = async (req, res) => {
+    const {userId} = req.params;
+
+    try {
+        // Check if userId is valid
+        const [usersCheck] = await db.query('SELECT * FROM users WHERE user_id = ?', [userId]);
+        if(usersCheck.length === 0){
+            return res.status(404).json({message: 'User not found'});
+        }
+
+        const [users] = await db.query('SELECT * FROM user_profiles WHERE user_id = ?', [userId]);
+
+        // If user profile not found
+        if(users.length === 0){
+            // Create a new user profile
+            const insertProfileRes = await db.query('INSERT INTO user_profiles (user_id) VALUES (?)', [userId]);
+            
+            console.log(insertProfileRes);
+
+            // Fetch the newly created profile
+            const [newProfiles] = await db.query('SELECT * FROM user_profiles WHERE user_id = ?', [userId]);
+
+            return res.status(201).json(newProfiles[0]);
+        }
+
+        return res.status(200).json(users[0]);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({message: 'Internal Server Error'});
+    }
+}
+
 // ============================ Authectication ============================
 const generateToken = (user) => {
     return jwt.sign({user_id: user.user_id, username: user.username}, process.env.JWT_SECRET, {
@@ -35,7 +67,7 @@ const generateToken = (user) => {
 
 const register = async (req, res) => {
     const {username, password} = req.body;
-    const hashedPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(15));
+    const hashedPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
     const user_id = Date.now().toString()+'-'+randomUUID();
 
     try {
@@ -59,12 +91,16 @@ const login = async (req, res) => {
     try {
         const [users] = await db.query('SELECT * FROM users WHERE username = ?', [username]);
         const user = users[0];
-        
-        if(users.length == 0 || !bcrypt.compareSync(password, user.password)){
+
+        if(!user){
             return res.status(400).json({message : 'Username or password is incorrect'});
         }
 
-        
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if(!isPasswordValid){
+            return res.status(400).json({message : 'Username or password is incorrect'});
+        }
+
         const token = generateToken(user);
         
         res.cookie('jwt', token, {
@@ -107,5 +143,6 @@ module.exports = {
     register,
     login,
     logout,
-    getProfile
+    getProfile,
+    getProfileByUserId
 }
