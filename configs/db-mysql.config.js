@@ -24,6 +24,22 @@ const createDatabase = () => {
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
                 )
             `
+        },{
+            name: 'user_profiles',
+            query: `
+                CREATE TABLE IF NOT EXISTS user_profiles (
+                    user_profile_id INT PRIMARY KEY AUTO_INCREMENT,
+                    user_id varchar(50) NOT NULL,
+                    first_name VARCHAR(50),
+                    last_name VARCHAR(50),
+                    email VARCHAR(100) UNIQUE,
+                    phone_number VARCHAR(50),
+                    profile_picture VARCHAR(255),
+                    bio TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+                )`
         },
         {
             name: 'private_chats',
